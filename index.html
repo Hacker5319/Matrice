@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Матрица Судьбы (рофельная)</title>
+<style>
+  *{box-sizing:border-box}
+
+  html,body{height:100%}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(1100px 600px at 50% -10%, #2a1a4d 0%, transparent 62%),
+      radial-gradient(800px 500px at 95% 105%, #3b1a3a 0%, transparent 60%),
+      #08060f;
+    color:#efe9ff;
+    font-family:"Segoe UI", system-ui, -apple-system, sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:34px 16px 70px;
+    overflow-x:hidden;
+  }
+
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index:0;
+    background-image:
+      radial-gradient(1.4px 1.4px at 12% 18%, rgba(255,255,255,.55), transparent),
+      radial-gradient(1.2px 1.2px at 78% 12%, rgba(255,255,255,.45), transparent),
+      radial-gradient(1.6px 1.6px at 34% 62%, rgba(255,255,255,.4), transparent),
+      radial-gradient(1.2px 1.2px at 88% 48%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.5px 1.5px at 62% 84%, rgba(255,255,255,.35), transparent),
+      radial-gradient(1.2px 1.2px at 22% 90%, rgba(255,255,255,.45), transparent),
+      radial-gradient(1.6px 1.6px at 52% 32%, rgba(255,255,255,.3), transparent),
+      radial-gradient(1.2px 1.2px at 94% 78%, rgba(255,255,255,.4), transparent);
+  }
+
+  main{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:700px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  h1{
+    font-size:clamp(24px, 6vw, 38px);
+    margin:0 0 6px;
+    text-align:center;
+    letter-spacing:.5px;
+    background:linear-gradient(90deg,#e8c07d,#f472b6,#a78bfa,#e8c07d);
+    background-size:300% 100%;
+    -webkit-background-clip:text; background-clip:text;
+    color:transparent;
+    animation:shine 8s linear infinite;
+  }
+  @keyframes shine{ to{ background-position:300% 0; } }
+
+  .sub{
+    margin:0 0 4px;
+    text-align:center;
+    color:rgba(239,233,255,.55);
+    font-size:14px;
+    letter-spacing:.04em;
+  }
+
+  .panel{
+    width:100%;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(232,192,125,.14);
+    border-radius:20px;
+    padding:16px 16px 18px;
+    margin-top:22px;
+  }
+  .panel-title{
+    margin:0 0 12px;
+    font-size:13px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:rgba(232,192,125,.7);
+    text-align:center;
+  }
+
+  form{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    width:100%;
+  }
+  input{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(232,192,125,.28);
+    color:#fff;
+    border-radius:12px;
+    padding:13px 14px;
+    font-size:15px;
+    font-family:inherit;
+    outline:none;
+    transition:.2s;
+    -moz-appearance:textfield;
+  }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  input::placeholder{ color:rgba(255,255,255,.32); }
+  input:focus{
+    border-color:#e8c07d;
+    box-shadow:0 0 0 3px rgba(232,192,125,.15);
+    background:rgba(255,255,255,.08);
+  }
+  #name{ flex:1 1 100%; max-width:340px; }
+  #day,#month{ width:76px; text-align:center; }
+  #year{ width:96px; text-align:center; }
+
+  .checkbox-wrap{
+    flex:1 1 100%;
+    max-width:340px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:6px 4px 2px;
+    cursor:pointer;
+    user-select:none;
+    font-size:13px;
+    color:rgba(239,233,255,.65);
+  }
+  .checkbox-wrap input[type="checkbox"]{
+    appearance:none;
+    -webkit-appearance:none;
+    width:20px;
+    height:20px;
+    flex:0 0 auto;
+    border-radius:6px;
+    border:1px solid rgba(232,192,125,.35);
+    background:rgba(255,255,255,.04);
+    cursor:pointer;
+    position:relative;
+    transition:.2s;
+    padding:0;
+  }
+  .checkbox-wrap input[type="checkbox"]:checked{
+    background:linear-gradient(135deg,#f472b6,#a78bfa);
+    border-color:#f472b6;
+    box-shadow:0 0 12px rgba(244,114,182,.5);
+  }
+  .checkbox-wrap input[type="checkbox"]:checked::after{
+    content:"✓";
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    color:#1a0f2e;
+    font-weight:900;
+  }
+  .checkbox-wrap:hover{ color:rgba(239,233,255,.9); }
+
+  button.go{
+    flex:1 1 100%;
+    max-width:340px;
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    font-size:16px;
+    font-weight:800;
+    font-family:inherit;
+    letter-spacing:.03em;
+    cursor:pointer;
+    color:#1a0f2e;
+    background:linear-gradient(90deg,#e8c07d,#f0a8d0,#a78bfa,#e8c07d);
+    background-size:250% 100%;
+    transition:.3s;
+  }
+  button.go:hover{
+    background-position:100% 0;
+    transform:translateY(-1px);
+    box-shadow:0 10px 28px rgba(167,139,250,.4);
+  }
+  button.go:active{ transform:translateY(0) scale(.99); }
+  button.go:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+    transform:none;
+    box-shadow:none;
+  }
+
+  button.go.alt{
+    background:linear-gradient(90deg,#a78bfa,#f472b6,#e8c07d,#a78bfa);
+    background-size:250% 100%;
+  }
+
+  #result{ width:100%; display:flex; flex-direction:column; align-items:center; }
+  #result[hidden]{ display:none; }
+
+  .matrix{
+    position:relative;
+    width:min(640px, 92vw);
+    aspect-ratio:1 / 1;
+    container-type:inline-size;
+    margin:14px auto 0;
+  }
+
+  .web{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    opacity:0;
+    animation:fadeIn 1s .3s forwards;
+  }
+  @keyframes fadeIn{ to{opacity:1} }
+
+  .center{
+    position:absolute;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    width:36%;
+    aspect-ratio:1 / 1;
+    border-radius:50%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.1em;
+    text-align:center;
+    padding:2.2cqw;
+    background:radial-gradient(circle at 50% 35%, rgba(139,92,246,.5), rgba(16,8,32,.94) 72%);
+    border:1px solid rgba(232,192,125,.5);
+    box-shadow:0 0 40px rgba(139,92,246,.45), inset 0 0 28px rgba(139,92,246,.35);
+    z-index:3;
+    animation:popCenter .6s cubic-bezier(.2,1.5,.5,1) both;
+    cursor:pointer;
+  }
+  @keyframes popCenter{
+    from{ opacity:0; transform:translate(-50%,-50%) scale(.5); }
+    to{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  }
+  .center:hover{ border-color:#f472b6; box-shadow:0 0 50px rgba(244,114,182,.55), inset 0 0 28px rgba(244,114,182,.4); }
+  .center .c-rune{ font-size:5cqw; line-height:1; }
+  .center .c-arc{
+    font-size:3.2cqw; font-weight:800; line-height:1.05;
+    background:linear-gradient(90deg,#e8c07d,#f472b6);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .center .c-name{
+    font-size:2.7cqw; font-weight:700; line-height:1.05;
+    color:#efe9ff; word-break:break-word; max-width:100%;
+    opacity:.92;
+  }
+  .center .c-date{
+    font-size:2cqw; letter-spacing:.06em;
+    color:rgba(232,192,125,.8);
+  }
+
+  .node{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    width:22%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:.26em;
+    background:none; border:none; padding:0; margin:0;
+    color:inherit; font-family:inherit;
+    cursor:pointer;
+    opacity:0;
+    z-index:2;
+    animation:nodeIn .6s cubic-bezier(.2,1.5,.5,1) forwards;
+  }
+  @keyframes nodeIn{
+    from{ opacity:0; transform:translate(-50%,-50%) scale(.5); }
+    to{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  }
+
+  .orb{
+    width:54%;
+    aspect-ratio:1 / 1;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:5.2cqw;
+    font-weight:800;
+    color:#fff;
+    background:radial-gradient(circle at 35% 28%, rgba(244,114,182,.4), rgba(139,92,246,.16) 62%, rgba(10,5,20,.92));
+    border:1px solid rgba(232,192,125,.42);
+    box-shadow:0 0 18px rgba(139,92,246,.35), inset 0 0 14px rgba(139,92,246,.3);
+    transition:transform .22s, box-shadow .22s, border-color .22s;
+  }
+  .node:hover .orb,
+  .node.active .orb{
+    border-color:#f472b6;
+    box-shadow:0 0 28px rgba(244,114,182,.65), inset 0 0 18px rgba(244,114,182,.4);
+    transform:scale(1.1);
+  }
+
+  .slot-label{
+    font-size:1.8cqw;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:rgba(232,192,125,.72);
+    line-height:1;
+  }
+  .arc-name{
+    font-size:2.45cqw;
+    font-weight:650;
+    line-height:1.12;
+    text-align:center;
+    color:#efe9ff;
+  }
+  .node.active .arc-name{ color:#f9a8d4; }
+
+  .node.branch{
+    width:16%;
+    z-index:1;
+  }
+  .node.branch .orb{
+    width:46%;
+    font-size:3.8cqw;
+    background:radial-gradient(circle at 35% 28%, rgba(232,192,125,.32), rgba(139,92,246,.14) 62%, rgba(10,5,20,.92));
+    border-color:rgba(232,192,125,.3);
+  }
+  .node.branch .slot-label{
+    font-size:1.5cqw;
+    color:rgba(232,192,125,.5);
+  }
+  .node.branch .arc-name{
+    font-size:1.85cqw;
+    color:rgba(239,233,255,.8);
+  }
+  .node.branch.active .arc-name{ color:#f9a8d4; }
+
+  .detail{
+    width:100%;
+    max-width:640px;
+    margin:24px auto 0;
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(232,192,125,.22);
+    border-radius:18px;
+    padding:18px 20px 20px;
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    animation:fadeIn .5s .5s both;
+  }
+  .detail-top{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .detail-orb{
+    flex:0 0 auto;
+    width:56px; height:56px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; font-weight:800;
+    background:radial-gradient(circle at 35% 28%, rgba(244,114,182,.45), rgba(139,92,246,.18) 65%, rgba(10,5,20,.9));
+    border:1px solid rgba(232,192,125,.45);
+    box-shadow:0 0 22px rgba(139,92,246,.4);
+  }
+  .detail-slot{
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:rgba(232,192,125,.75);
+    margin-bottom:3px;
+  }
+  .detail-name{
+    font-size:20px;
+    font-weight:800;
+    line-height:1.15;
+    background:linear-gradient(90deg,#e8c07d,#f472b6);
+    -webkit-background-clip:text; background-clip:text;
+    color:transparent;
+  }
+  .detail-roast{
+    margin:14px 0 0;
+    font-size:15.5px;
+    line-height:1.55;
+    color:rgba(239,233,255,.86);
+  }
+
+  .compat{
+    width:100%;
+    max-width:700px;
+    margin-top:30px;
+  }
+  .compat-head{
+    text-align:center;
+    margin-bottom:16px;
+  }
+  .compat-head h2{
+    margin:0 0 4px;
+    font-size:clamp(20px,5vw,26px);
+    background:linear-gradient(90deg,#f472b6,#e8c07d,#a78bfa);
+    -webkit-background-clip:text; background-clip:text;
+    color:transparent;
+  }
+  .compat-head p{
+    margin:0;
+    font-size:13px;
+    color:rgba(239,233,255,.5);
+    letter-spacing:.05em;
+  }
+
+  .compat-verdict{
+    width:100%;
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(232,192,125,.25);
+    border-radius:18px;
+    padding:16px 18px;
+    margin-bottom:18px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .compat-verdict .cv-orb{
+    flex:0 0 auto;
+    width:64px; height:64px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px; font-weight:800;
+    background:radial-gradient(circle at 35% 28%, rgba(244,114,182,.5), rgba(139,92,246,.2) 65%, rgba(10,5,20,.9));
+    border:1px solid rgba(232,192,125,.5);
+    box-shadow:0 0 26px rgba(244,114,182,.45);
+  }
+  .compat-verdict .cv-slot{
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:rgba(232,192,125,.8);
+    margin-bottom:2px;
+  }
+  .compat-verdict .cv-name{
+    font-size:19px;
+    font-weight:800;
+    background:linear-gradient(90deg,#e8c07d,#f472b6);
+    -webkit-background-clip:text; background-clip:text;
+    color:transparent;
+  }
+  .compat-verdict .cv-roast{
+    margin:8px 0 0;
+    font-size:14.5px;
+    line-height:1.5;
+    color:rgba(239,233,255,.85);
+  }
+
+  .compat-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+  }
+  .compat-card{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(232,192,125,.16);
+    border-radius:14px;
+    padding:12px 14px;
+    transition:.2s;
+    cursor:pointer;
+  }
+  .compat-card:hover{
+    border-color:rgba(244,114,182,.5);
+    background:rgba(244,114,182,.06);
+  }
+  .cc-slot{
+    font-size:10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:rgba(232,192,125,.7);
+    margin-bottom:4px;
+  }
+  .cc-val{
+    font-size:15px;
+    font-weight:800;
+    color:#f9a8d4;
+    margin-bottom:2px;
+  }
+  .cc-name{
+    font-size:13.5px;
+    line-height:1.3;
+    color:#efe9ff;
+  }
+  .cc-diff{
+    margin-top:6px;
+    font-size:11px;
+    letter-spacing:.06em;
+    color:rgba(239,233,255,.45);
+  }
+  .cc-diff.hot{ color:#f472b6; }
+  .cc-diff.warm{ color:#e8c07d; }
+  .cc-diff.cold{ color:#a78bfa; }
+
+  .compat-summary{
+    margin-top:16px;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(232,192,125,.16);
+    border-radius:14px;
+    padding:14px 16px;
+  }
+  .compat-summary h3{
+    margin:0 0 10px;
+    font-size:14px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:rgba(232,192,125,.8);
+  }
+  .compat-summary p{
+    margin:0 0 10px;
+    font-size:14.5px;
+    line-height:1.6;
+    color:rgba(239,233,255,.85);
+  }
+  .compat-summary p:last-child{ margin-bottom:0; }
+  .badge{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-right:6px;
+  }
+  .badge.good{ background:rgba(232,192,125,.18); color:#e8c07d; }
+  .badge.bad{ background:rgba(244,114,182,.18); color:#f472b6; }
+  .badge.neutral{ background:rgba(167,139,250,.18); color:#a78bfa; }
+
+  .footnote{
+    margin:34px 0 0;
+    font-size:12px;
+    color:rgba(239,233,255,.3);
+    text-align:center;
+    letter-spacing:.05em;
+    max-width:560px;
+    line-height:1.6;
+  }
+  .footnote .meme67{
+    color:rgba(244,114,182,.5);
+  }
+
+  @media (max-width:520px){
+    .detail{padding:16px}
+    .detail-roast{font-size:14.5px}
+    .slot-label{font-size:2.2cqw}
+    .arc-name{font-size:3cqw}
+    .compat-grid{grid-template-columns:1fr}
+    .compat-verdict{flex-direction:column; text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<main>
+  <h1>🔮  Матрица Судьбы</h1>
+  <p class="sub">не философская. рофельная.</p>
+
+  <div class="panel">
+    <p class="panel-title">Человек №1</p>
+    <form id="form" autocomplete="off">
+      <input id="name" type="text" placeholder="Имя (или как тебя зовут в чате)" maxlength="24">
+      <input id="day"   type="number" placeholder="ДД"   min="1" max="31" required>
+      <input id="month" type="number" placeholder="ММ"   min="1" max="12" required>
+      <input id="year"  type="number" placeholder="ГГГГ" min="1900" max="2100" required>
+      <label class="checkbox-wrap">
+        <input id="ack1" type="checkbox">
+        <span>Я ознакомлен со своими мозгами</span>
+      </label>
+      <button class="go" type="submit" id="go1" disabled>Рассчитать судьбу</button>
+    </form>
+  </div>
+
+  <section id="result" hidden>
+    <div class="matrix" id="matrix"></div>
+    <div class="detail" id="detail"></div>
+  </section>
+
+  <div class="panel">
+    <p class="panel-title">Совместимость пары</p>
+    <form id="form2" autocomplete="off">
+      <input id="name2" type="text" placeholder="Имя партнёра" maxlength="24">
+      <input id="day2"   type="number" placeholder="ДД"   min="1" max="31" required>
+      <input id="month2" type="number" placeholder="ММ"   min="1" max="12" required>
+      <input id="year2"  type="number" placeholder="ГГГГ" min="1900" max="2100" required>
+      <label class="checkbox-wrap">
+        <input id="ack2" type="checkbox">
+        <span>Я ознакомлен со своими мозгами (и мозгами партнёра)</span>
+      </label>
+      <button class="go alt" type="submit" id="go2" disabled>Проверить совместимость</button>
+    </form>
+  </div>
+
+  <section id="compatResult" class="compat" hidden></section>
+
+  <p class="footnote">Все совпадения случайны. Почти.<br><span class="meme67">Это навайбкожено, что логично. Если вы об этом написали, поздравляю, вы не изучили матрицу. Изучите</span></p>
+</main>
+
+<script>
+const ARCANA = [
+  { emoji:"☕",  name:"Бариста",                  roast:"4 года на юриста — и ты бариста! Зато латте с собой дешевле. В 2026 году это уже не профессия, это диагноз. ☕😮‍💨" },
+  { emoji:"💻",  name:"Тимлид",                   roast:"Ты не руководишь. Ты просто пишешь в чат «какие успехи, команда?» и ждёшь. Команда тоже ждёт. Все ждут. Это и есть менеджмент. 🤡📉" },
+  { emoji:"🐈",  name:"Кот",                      roast:"Спишь 18 часов в сутки и называешь это «режимом восстановления». В 2026 году коты уже вышли на работу. Ты — нет. 🐈‍⬛💤" },
+  { emoji:"🖥️", name:"Айтишник",                 roast:"Самый длительный роман твоей жизни — с рабочим ноутбуком. И он токсичный. Но ты всё равно возвращаешься. 💻💔" },
+  { emoji:"🔮",  name:"Шальная таро-блогерка",    roast:"Ты не гадаешь. Ты «консультируешь по вопросам». Разница юридическая. В 2026-м таро уже в суде как доказательство. 🔮⚖️" },
+  { emoji:"📢",  name:"Телеграм-канал",           roast:"12 подписчиков. 11 из них — боты. Двенадцатый — мама. Она не читает, но ставит огонёк. В 2026 году канал — это уже не блог, это личный дневник с публичным доступом. Ты пишешь туда, как в пустоту. Пустота ставит лайк. Иногда. 🕯️📉" },
+  { emoji:"🏠",  name:"Ипотека",                  roast:"30 лет. И все 30 ты платишь. Квартира твоя, но как бы и нет. В 2026-м ипотека — это уже не кредит, это образ жизни. И ты в нём живёшь. 🏠😵" },
+  { emoji:"🥗",  name:"Понедельник",              roast:"Худеешь с понедельника. Понедельник наступает каждую неделю. Уже 40 лет. Понедельник не виноват. 🥗😤" },
+  { emoji:"👻",  name:"Бывший",                   roast:"Ты его забыл. Матрица — нет. Матрица помнит всё. Думать о бывшем in the big 2026 — это уже не ностальгия, это кринж. 🥀👻" },
+  { emoji:"📞",  name:"Мама",                     roast:"Мама звонит не узнать, как дела. Мама звонит узнать, почему не звонишь. В 2026 году мама уже в курсе всего. Даже того, что ты не знал. 📞👁️" },
+  { emoji:"🔥",  name:"Выгорание",                roast:"Ты не устал. Ты просто больше не хочешь. И, честно говоря, это нормально. В 2026 году выгорание — это уже не состояние, это стиль жизни. 🔥😶" },
+  { emoji:"🥟",  name:"Пельмени",                 roast:"Твой главный кулинарный навык — открыть морозилку. И это навык, между прочим. В 2026-м пельмени — это уже не еда, это ритуал. 🥟🫡" },
+  { emoji:"☕",  name:"Кофейный сноб",            roast:"Ты чувствуешь нотки бергамота и жасмина. Остальные чувствуют цену — 490 рублей. В 2026-м кофе дороже совести. ☕💸" },
+  { emoji:"🌙",  name:"Шальной астролог",         roast:"Меркурий ретроградный — значит, сегодня не работаем. И завтра тоже. И всю неделю. В 2026 году Меркурий уже ретроградный 24/7. 🌙🤡" },
+  { emoji:"😰",  name:"Тревожность",              roast:"Ты прокрутил этот разговор в голове 47 раз. Разговор не состоялся. И не планировался. В 2026-м тревожность — это уже не диагноз, это хобби. 😰🌀" },
+  { emoji:"💰",  name:"Блогер-миллионер",         roast:"Ты видел его в рекламе. Значит, он существует. Значит, и ты сможешь. Наверное. В 2026-м реклама — это уже не обман, это жанр. 💰🤡" },
+  { emoji:"🐕",  name:"Собака",                   roast:"Искренне радуешься, когда кто-то приходит домой. Даже если это ты сам. В 2026-м собака — единственный, кто ещё рад. 🐕🥹" },
+  { emoji:"🛋️", name:"Шальной психолог",         roast:"Ты уже всё про себя знаешь. Всё. И всё равно. Просто теперь со словарём. В 2026-м психолог — это не профессия, это ты. 🛋️📚" },
+  { emoji:"🛍️", name:"Шопоголик",               roast:"В корзине на 47 тысяч. Нужен один носок. Ты купишь носок. И ещё 12 позиций. В 2026-м корзина — это не покупки, это надежда. 🛍️💳" },
+  { emoji:"📉",  name:"Инвестор",                 roast:"Купил на дне. Дно пробило. Купил ещё. Дно пробило снова. Ты называешь это «стратегией». В 2026-м стратегия — это когда ты просто не смотришь. 📉🤡" },
+  { emoji:"🐹",  name:"Хомяк",                    roast:"Запасы на три апокалипсиса. Пакетов с пакетами — четыре. Выбросить нельзя, вдруг пригодится. В 2026-м хомяк — это уже профессия. 🐹📦" },
+  { emoji:"✈️", name:"Шальной путешественник",   roast:"Отпуск 4 дня. Потрачено 8 зарплат. Впечатлений — на год вперёд. Спишь потом тоже год. В 2026-м отпуск — это уже не отдых, это подвиг. ✈️😴" },
+  { emoji:"🎮",  name:"Геймер",                   roast:"«Последний матч» длится с 2019 года. Ты уже сам не веришь в это. В 2026-м последний матч — это уже не матч, это образ жизни. 🎮🕹️" },
+  { emoji:"📱",  name:"Тиктокер",                 roast:"Снял 300 роликов. Вирусным стал тот, где ты упал. Так и живёшь. В 2026-м падение — это уже контент. 📱🤕" },
+  { emoji:"🧋",  name:"Бабл-ти",                  roast:"Пьёшь сладкий чай с шариками и называешь это «инвестицией в себя». В 2026-м бабл-ти — это уже не напиток, это философия. 🧋✨" },
+  { emoji:"🧘",  name:"Шальная медитация",       roast:"Открыл приложение. Посмотрел на таймер. Закрыл. Ты уже почти просветлён. В 2026-м медитация — это когда ты просто закрыл глаза. 🧘‍♂️😌" },
+  { emoji:"🍕",  name:"Пицца-мастер",             roast:"Доставка 30 минут. Ты ждёшь 90. Пицца едет к тебе через полстраны. Остывшая, но своя. В 2026-м пицца — это уже не еда, это квест. 🍕🗺️" },
+  { emoji:"📚",  name:"Книголюб",                 roast:"Купил 12 книг. Прочитал одну. Но эта одна — точно изменит жизнь. Когда-нибудь. В 2026-м книга — это уже не чтение, это обещание. 📚🤞" },
+  { emoji:"🎧",  name:"Меломан",                  roast:"Плейлист на 40 часов. Слушаешь те же 5 треков. Остальные — для статуса. В 2026-м плейлист — это уже не музыка, это личность. 🎧🎶" },
+  { emoji:"🛌",  name:"Соня",                     roast:"«Ещё пять минут» — твоя мантра. Пять минут длятся 45. Ты профессионал. В 2026-м сон — это уже не отдых, это протест. 🛌✊" },
+  { emoji:"🍣",  name:"Суши-гурман",              roast:"Ешь роллы с вилкой. Это не грех, это адаптация. Но суши-мастер плачет. В 2026-м вилка — это уже не инструмент, это заявление. 🍣😢" },
+  { emoji:"🚗",  name:"Автолюбитель",             roast:"Моешь машину чаще, чем себя. Машина блестит. Ты — не очень. В 2026-м машина — это уже не транспорт, это ребёнок. 🚗🧼" },
+  { emoji:"🧸",  name:"Коллекционер",             roast:"Полка с фигурками. Ты знаешь каждую по имени. У них даже есть характер. В 2026-м фигурки — это уже не хобби, это семья. 🧸👨‍👩‍👧‍👦" },
+  { emoji:"🌿",  name:"Растениевод",              roast:"У тебя 20 растений. Выжило 3. Ты называешь это «естественным отбором». В 2026-м растение — это уже не декор, это тест. 🌿💀" },
+  { emoji:"🎲",  name:"Шальной лудоман",         roast:"«На этот раз повезёт». Матрица говорит: нет. Но ты не слушаешь. В 2026-м удача — это уже не случайность, это вера. 🎲🙏" },
+  { emoji:"🍜",  name:"Рамен-мастер",             roast:"Ешь рамен в 3 часа ночи и считаешь это культурным обменом с Японией. В 2026-м рамен — это уже не еда, это дипломатия. 🍜🇯🇵" },
+  { emoji:"🎨",  name:"Шальной художник",         roast:"Начал 12 картин. Закончил 0. Но зато купил ещё одну кисть. Для вдохновения. В 2026-м кисть — это уже не инструмент, это надежда. 🎨🖌️" },
+  { emoji:"🐟",  name:"Рыбак",                    roast:"Поймал 0 рыб. Провёл 8 часов. Это не про рыбу. Это про дзен. И про пиво. В 2026-м рыбалка — это уже не хобби, это терапия. 🐟🍺" },
+  { emoji:"🏋️", name:"Качок",                    roast:"Три раза в неделю зал. Три раза в неделю болят мышцы. Ты уже почти Арнольд. Почти. В 2026-м зал — это уже не спорт, это религия. 🏋️💪" },
+  { emoji:"🍰",  name:"Кондитер",                 roast:"Испечёшь торт — съешь сам. Не потому что вкусно. Потому что жалко выбрасывать. В 2026-м торт — это уже не десерт, это судьба. 🍰😋" },
+  { emoji:"📸",  name:"Фотограф",                 roast:"Сделал 2000 фото. Отобрал 2. Оба нерезкие. Но ты в них «живой». В 2026-м фото — это уже не память, это доказательство. 📸🔍" },
+  { emoji:"🎤",  name:"Караоке-звезда",           roast:"Поёшь в душе. Соседи знают весь репертуар. Ты — звезда подъезда. В 2026-м душ — это уже не гигиена, это сцена. 🎤🚿" },
+  { emoji:"🦸",  name:"Шальной супергерой",      roast:"Спасаешь мир по вторникам. В остальные дни — спасаешь себя. И это тоже подвиг. В 2026-м супергерой — это тот, кто встал с кровати. 🦸🛏️" },
+  { emoji:"🧙",  name:"Волшебник",                roast:"Творишь магию: закрываешь 15 вкладок и чувствуешь, что жизнь налаживается. В 2026-м магия — это уже не волшебство, это гигиена. 🧙✨" },
+  { emoji:"👽",  name:"Инопланетянин",            roast:"Ты не такой, как все. И это прекрасно. Правда, на вечеринках ты всё равно стоишь у стены. В 2026-м стена — это уже не стена, это друг. 👽🧱" },
+  { emoji:"🦄",  name:"Шальной единорог",        roast:"Ты уникален. Остальные просто не понимают. Единороги тоже не всегда понимают, но не сдаются. В 2026-м уникальность — это уже не качество, это нагрузка. 🦄😵‍💫" },
+  { emoji:"🐉",  name:"Дракон",                   roast:"Копишь сокровища. Сокровища — это чеки, стикеры и старые зарядки. Но это твои сокровища. В 2026-м сокровища — это уже не золото, это хлам. 🐉📦" },
+  { emoji:"🎩",  name:"Шальной иллюзионист",     roast:"Исчезаешь из чатов на неделю. Возвращаешься с «извините, был занят». Фокус в том, что никто не заметил. В 2026-м исчезновение — это уже не фокус, это норма. 🎩👻" },
+  { emoji:"🕵️", name:"Детектив",                 roast:"Прочитал переписку трижды. Нашёл скрытый смысл в «ок». Скрытого смысла нет. Но ты уже построил теорию. В 2026-м «ок» — это уже не ответ, это загадка. 🕵️🔍" },
+  { emoji:"🧟",  name:"Зомби",                    roast:"Встаёшь в 7 утра, идёшь на работу, возвращаешься. Повторяешь. Ты не зомби. Ты просто очень стараешься. В 2026-м зомби — это уже не монстр, это сотрудник. 🧟‍♂️💼" },
+  { emoji:"🧛",  name:"Шальной вампир",          roast:"Просыпаешься к закату. Живёшь ночью. Днём — только по расписанию. Солнце — не твой друг. В 2026-м солнце — это уже не свет, это угроза. 🧛☀️" },
+  { emoji:"🧜",  name:"Русалка",                  roast:"Обещаешь всё, а потом молчишь. Голос есть, но пользоваться им — необязательно. В 2026-м молчание — это уже не пауза, это ответ. 🧜🤐" },
+  { emoji:"🧚",  name:"Шальная фея",             roast:"Помогаешь всем, кроме себя. Раздаёшь советы, которые сам не выполняешь. И это волшебно. В 2026-м помощь — это уже не доброта, это рефлекс. 🧚✨" },
+  { emoji:"🦉",  name:"Сова",                     roast:"Сова — это не птица. Сова — это состояние. Ты не выспался. Ты никогда не высыпаешься. В 2026-м сова — это уже не ночной житель, это диагноз. 🦉😴" },
+  { emoji:"🐢",  name:"Черепаха",                 roast:"Медленно, но верно. В основном медленно. Зато с панцирем. И это уже защита. В 2026-м медленно — это уже не скорость, это стратегия. 🐢🛡️" },
+  { emoji:"🦥",  name:"Шальной ленивец",         roast:"Ты не ленивый. Ты энергосберегающий. Это разные вещи. Наверное. В 2026-м лень — это уже не грех, это экология. 🦥🌿" },
+  { emoji:"🐙",  name:"Осьминог",                 roast:"Восемь дел одновременно. Восемь рук. Восемь провалов. Но ты многозадачный. В 2026-м многозадачность — это уже не навык, это проклятие. 🐙😵" },
+  { emoji:"🦅",  name:"Орёл",                     roast:"Паришь над суетой. Сверху всё видно. Жаль, что сверху тебя тоже видно. В 2026-м высота — это уже не свобода, это обзор. 🦅👀" },
+  { emoji:"🦁",  name:"Шальной лев",             roast:"Царь зверей. В основном в своих фантазиях. Но рычишь ты убедительно. В 2026-м рык — это уже не угроза, это контент. 🦁🎤" },
+  { emoji:"🐺",  name:"Волк",                     roast:"Одиночка. Устал от всех. Но первым пишешь «как вы там?». Волк-социофоб. В 2026-м одиночество — это уже не выбор, это режим. 🐺📱" },
+  { emoji:"🐸",  name:"Жаба",                     roast:"Всё видишь, всё знаешь, всё осуждаешь. И молчишь. Это твоя суперсила. В 2026-м молчание — это уже не скромность, это позиция. 🐸👁️" },
+  { emoji:"🐝",  name:"Пчела",                    roast:"Трудишься, трудишься, трудишься. Мёда нет. Но ты очень старалась. И это тоже мёд. В 2026-м мёд — это уже не награда, это процесс. 🐝🍯" },
+  { emoji:"🦋",  name:"Шальная бабочка",         roast:"Меняешься каждые полгода. Старое не помнишь. Новое не узнаёшь. Красиво и тревожно. В 2026-м перевоплощение — это уже не рост, это рефлекс. 🦋🌀" },
+  { emoji:"🌵",  name:"Кактус",                   roast:"Не трогай. Тебе сказали. Ты всё равно трогаешь. И это уже про тебя, а не про кактус. В 2026-м кактус — это уже не растение, это граница. 🌵🚫" },
+  { emoji:"🌻",  name:"Подсолнух",                roast:"Смотришь на солнце. Всё время. Пока не выгоришь. Потом смотришь на луну. И начинаешь заново. В 2026-м солнце — это уже не свет, это цель. 🌻☀️" },
+  { emoji:"🍄",  name:"Шальной гриб",            roast:"Внешне спокойный. Внутри — мицелий из тревог и планов. Иногда полезный. Иногда — просто поганка. В 2026-м гриб — это уже не еда, это настроение. 🍄🌀" },
+  { emoji:"🌙",  name:"Луна",                     roast:"Меняешь настроение чаще, чем погоду. И никто не может предсказать. Даже ты. В 2026-м луна — это уже не спутник, это ты. 🌙🎭" },
+  { emoji:"⭐",  name:"Звезда",                   roast:"Светишь далеко. До тебя не дозвониться. Но ты есть. И это уже что-то. В 2026-м звезда — это уже не слава, это связь. ⭐📡" },
+  { emoji:"🌪️", name:"Шальной вихрь",           roast:"Всё вертится. Всё летит. Ничего не понятно, но очень интересно. Ты и есть интересно. В 2026-м вихрь — это уже не хаос, это стиль. 🌪️🌀" },
+  { emoji:"🌊",  name:"Волна",                    roast:"Накрываешь всех. Потом отходишь. Потом снова накрываешь. Ты не токсичный. Ты периодический. В 2026-м волна — это уже не эмоция, это цикл. 🌊🔄" },
+  { emoji:"⛰️", name:"Гора",                     roast:"Стоишь на месте. Не двигаешься. Все ходят вокруг. Ты — опора. Или просто упёрся. В 2026-м гора — это уже не сила, это упрямство. ⛰️😤" },
+  { emoji:"🔥",  name:"Шальной огонь",           roast:"Горишь. В основном на работе. Иногда на кухне. Но горишь красиво — и это главное. В 2026-м огонь — это уже не страсть, это режим. 🔥💼" },
+  { emoji:"💧",  name:"Капля",                    roast:"Капаешь на мозги всем. Включая себя. Зато находишь путь туда, куда другие не доходят. В 2026-м капля — это уже не вода, это стратегия. 💧🧠" },
+  { emoji:"🌈",  name:"Шальная радуга",          roast:"Обещаешь всем всё. Сразу. Потом исчезаешь. Это не обман. Это природа. В 2026-м радуга — это уже не чудо, это обещание. 🌈🤞" },
+  { emoji:"🕯️", name:"Свеча",                   roast:"Светишь, пока есть воск. Тебе всё время кажется, что воск кончился. Но нет. Ты ещё горишь. В 2026-м воск — это уже не ресурс, это вера. 🕯️🕯️" },
+  { emoji:"💎",  name:"Кристалл",                 roast:"Твёрдый, красивый, редкий. И трескаешься от любого удара. Просто трещин не видно. Ты в порядке. Точно. В 2026-м кристалл — это уже не камень, это маска. 💎🎭" },
+  { emoji:"🧭",  name:"Компас",                   roast:"Показываешь всем путь. Себе — нет. Зато у тебя красивая стрелка и намерение. В 2026-м компас — это уже не навигация, это ирония. 🧭😅" },
+  { emoji:"🔑",  name:"Ключ",                     roast:"Ты открываешь двери. Всем. Кроме своей. Своя — заперта. Ты потерял ключ. Вот он, у тебя в руке. В 2026-м ключ — это уже не доступ, это загадка. 🔑🤔" },
+  { emoji:"📎",  name:"Скрепка",                  roast:"Все думают, что ты мелкий и бесполезный. Ты держишь это всё вместе. В смысле, всю папку. В 2026-м скрепка — это уже не канцелярия, это опора. 📎💪" },
+  { emoji:"🎭",  name:"Шальной актёр",           roast:"Играешь роль уверенного человека. Оскар за это не дают. Но зрители верят. В 2026-м вера — это уже не доверие, это привычка. 🎭🏆" },
+  { emoji:"🎪",  name:"Циркач",                   roast:"Жонглируешь работой, семьёй и отдыхом. Всё падает. Но ты улыбаешься. И это главное. В 2026-м цирк — это уже не развлечение, это будни. 🎪🤹" },
+  { emoji:"🎯",  name:"Снайпер",                  roast:"Ставишь цель и идёшь. Идёшь. Идёшь. Цель давно ушла. Ты идёшь. Это упорство. Наверное. В 2026-м цель — это уже не точка, это направление. 🎯🚶" },
+  { emoji:"🎰",  name:"Шальной автомат",         roast:"Дёргаешь за рычаг. Ждёшь. Не выпало. Дёргаешь снова. Когда-нибудь выпадет. Ты веришь. В 2026-м вера — это уже не надежда, это навык. 🎰🙏" },
+  { emoji:"🧩",  name:"Пазл",                     roast:"Собираешь себя по кусочкам. Кусочков больше, чем картинки. Но ты стараешься. И это красиво. В 2026-м пазл — это уже не игра, это жизнь. 🧩🖼️" },
+  { emoji:"🪞",  name:"Шальное зеркало",         roast:"Отражаешь всех. Кроме себя. Себя — не видишь. Смотришь и не узнаёшь. Зеркало не виновато. В 2026-м зеркало — это уже не правда, это фильтр. 🪞✨" },
+  { emoji:"🕳️", name:"Дыра",                     roast:"Всё проваливается: время, деньги, планы. Ты не дыра. Ты просто очень глубокий. Света не видно, но он есть. В 2026-м глубина — это уже не пустота, это объём. 🕳️🌌" },
+  { emoji:"🪐",  name:"Планета",                  roast:"У тебя своя атмосфера и своя орбита. Иногда с тобой сталкиваются. Это называется «отношения». В 2026-м орбита — это уже не путь, это характер. 🪐💫" },
+  { emoji:"🌋",  name:"Шальной вулкан",          roast:"Внешне спокоен. Внутри — магма. Иногда извергаешься. Потом остываешь. Потом снова спокоен. Цикл. В 2026-м цикл — это уже не процесс, это судьба. 🌋🔄" },
+  { emoji:"❄️", name:"Снежинка",                 roast:"Уникальная, красивая, холодная. И таешь от любого тепла. Это не слабость. Это физика. В 2026-м физика — это уже не наука, это оправдание. ❄️🥶" },
+  { emoji:"🎈",  name:"Шальной шарик",           roast:"Летишь вверх. Все смотрят. Потом ты лопаешься. Никто не помнит, но это было красиво. В 2026-м красота — это уже не эстетика, это вспышка. 🎈💥" },
+  { emoji:"🍬",  name:"Конфета",                  roast:"Сладкий снаружи, твёрдый внутри. Разворачиваешь — и уже поздно. Ты был вкусным. И это факт. В 2026-м вкус — это уже не качество, это опыт. 🍬😋" },
+  { emoji:"🧦",  name:"Шальной носок",           roast:"Ты теряешься в стирке. В жизни — тоже. Но ты нужен. Без тебя холодно. И это твоя суперсила. В 2026-м носок — это уже не одежда, это символ. 🧦🔍" },
+  { emoji:"🪑",  name:"Стул",                     roast:"На тебе все сидят. Ты держишь. Ты нужен. Но тебя не замечают. Пока не сломаешься. В 2026-м стул — это уже не мебель, это роль. 🪑😤" },
+  { emoji:"📦",  name:"Коробка",                  roast:"Внутри — всё. Снаружи — ничего не понятно. Ты хранишь. Ты перевозишь. Ты — логистика жизни. В 2026-м коробка — это уже не упаковка, это склад. 📦🏗️" },
+  { emoji:"🔋",  name:"Батарейка",                roast:"Заряжаешь всех. Себя — нет. Садишься. Тебя меняют. Ты снова заряжаешь. Круговорот батареек. В 2026-м батарейка — это уже не энергия, это цикл. 🔋🔄" },
+  { emoji:"💡",  name:"Лампочка",                 roast:"Включаешься не вовремя. Горишь ярко. Перегораешь. Тебя меняют. И снова — идеи. И снова — свет. В 2026-м идея — это уже не мысль, это вспышка. 💡✨" },
+  { emoji:"🧲",  name:"Магнит",                   roast:"Притягиваешь людей. И проблемы. И носки. Всё притягиваешь. Ты не выбираешь. Ты просто магнит. В 2026-м магнит — это уже не свойство, это призвание. 🧲🧦" },
+  { emoji:"🪁",  name:"Воздушный змей",           roast:"Летишь, пока держат. Отпустят — упадёшь. Держат — летишь. Ты не свободен. Но ты высоко. В 2026-м высота — это уже не свобода, это зависимость. 🪁🌀" },
+  { emoji:"🛰️", name:"Спутник",                 roast:"Вращаешься вокруг чужой планеты. Сигналы передаёшь. Своей орбиты нет. Но ты нужен. Ты связь. В 2026-м связь — это уже не роскошь, это кислород. 🛰️📡" },
+  { emoji:"🎬",  name:"Шальной режиссёр",        roast:"Планируешь сцены жизни. Актёры не пришли. Сценарий поменялся. Ты снимаешь дальше. Это авторское кино. В 2026-м кино — это уже не искусство, это терапия. 🎬🎥" },
+  { emoji:"🧵",  name:"Нить",                     roast:"Связываешь всех. Тонкая, но прочная. Иногда рвёшься. Тогда все рассыпаются. И понимают, что ты был важна. В 2026-м нить — это уже не связь, это каркас. 🧵🕸️" },
+  { emoji:"🪄",  name:"Волшебная палочка",        roast:"Взмах — и ничего. Взмах — и чудо. Ты не знаешь, когда сработает. Но взмахиваешь. Это и есть вера. В 2026-м вера — это уже не надежда, это действие. 🪄✨" },
+  { emoji:"🎁",  name:"Шальной подарок",         roast:"Внутри — сюрприз. Снаружи — упаковка. Иногда сюрприз не тот. Но ты старался. И это считается. В 2026-м сюрприз — это уже не радость, это лотерея. 🎁🎲" }
+];
+
+const SLOTS = [
+  { key:"left",        angle:180, label:"Личность"        },
+  { key:"topLeft",     angle:225, label:"Таланты"         },
+  { key:"top",         angle:270, label:"Род"             },
+  { key:"topRight",    angle:315, label:"Предназначение"  },
+  { key:"right",       angle:0,   label:"Финансы"         },
+  { key:"bottomRight", angle:45,  label:"Любовь"          },
+  { key:"bottom",      angle:90,  label:"Главная задача"  },
+  { key:"bottomLeft",  angle:135, label:"Хвост кармы"     }
+];
+
+const BRANCHES = [
+  { key:"b1", parent:["left","topLeft"],        angle:202, label:"Тень"    },
+  { key:"b2", parent:["top","topLeft"],         angle:247, label:"Дар"     },
+  { key:"b3", parent:["top","topRight"],        angle:292, label:"Урок"    },
+  { key:"b4", parent:["topRight","right"],      angle:337, label:"Путь"    },
+  { key:"b5", parent:["right","bottomRight"],   angle:22,  label:"Ресурс"  },
+  { key:"b6", parent:["bottomRight","bottom"],  angle:67,  label:"Сердце"  },
+  { key:"b7", parent:["bottom","bottomLeft"],   angle:112, label:"Судьба"  },
+  { key:"b8", parent:["bottomLeft","left"],     angle:157, label:"Корень"  }
+];
+
+const R_POS = 43;
+const R_BRANCH = 29;
+const SVGNS = "http://www.w3.org/2000/svg";
+const ARCANA_COUNT = ARCANA.length;
+
+function digitSum(n){
+  return String(Math.abs(n)).split("").reduce((a, c) => a + Number(c), 0);
+}
+function reduceTo(n, max){
+  n = Math.abs(Math.round(n));
+  let guard = 0;
+  while (n > max && guard++ < 30) n = digitSum(n);
+  if (n === 0) n = max;
+  return n;
+}
+function reduceArcana(n){ return reduceTo(n, ARCANA_COUNT); }
+function nameHash(name){
+  if (!name) return 1;
+  const arr = Array.from(name.toLowerCase());
+  const s = arr.reduce((a, c) => a + c.charCodeAt(0), 0);
+  return (s % ARCANA_COUNT) + 1;
+}
+function arcAt(v){ return ARCANA[Math.min(Math.max(v,1), ARCANA_COUNT) - 1]; }
+
+function computeMatrix(day, month, year, name){
+  const dV = reduceArcana(day);
+  const mV = reduceArcana(month);
+  const yV = reduceArcana(year);
+  const dateStr = String(day) + String(month) + String(year);
+  const base = {
+    left:        reduceArcana(dV),
+    topLeft:     reduceArcana(day + month),
+    top:         reduceArcana(mV),
+    topRight:    reduceArcana(month + year),
+    right:       reduceArcana(yV),
+    bottomRight: reduceArcana(day + yV),
+    bottom:      reduceArcana(day + month + year),
+    bottomLeft:  reduceArcana(digitSum(dateStr) + nameHash(name))
+  };
+  const branches = {};
+  BRANCHES.forEach(b => {
+    const sum = base[b.parent[0]] + base[b.parent[1]];
+    branches[b.key] = reduceArcana(sum);
+  });
+  const center = reduceArcana(day);
+  return { main: base, branches, center };
+}
+
+function compatMatrix(a, b){
+  const main = {};
+  SLOTS.forEach(s => {
+    main[s.key] = reduceArcana(a.main[s.key] + b.main[s.key]);
+  });
+  const branches = {};
+  BRANCHES.forEach(br => {
+    branches[br.key] = reduceArcana(a.branches[br.key] + b.branches[br.key]);
+  });
+  const center = reduceArcana(a.center + b.center);
+  return { main, branches, center };
+}
+
+function polarPoint(angleDeg, radius, cx = 50, cy = 50){
+  const a = angleDeg * Math.PI / 180;
+  return [cx + radius * Math.cos(a), cy + radius * Math.sin(a)];
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+const form        = document.getElementById("form");
+const result      = document.getElementById("result");
+const matrix      = document.getElementById("matrix");
+const detail      = document.getElementById("detail");
+const form2       = document.getElementById("form2");
+const compatResult= document.getElementById("compatResult");
+const ack1        = document.getElementById("ack1");
+const ack2        = document.getElementById("ack2");
+const go1         = document.getElementById("go1");
+const go2         = document.getElementById("go2");
+
+let activeNode = null;
+
+ack1.addEventListener("change", () => { go1.disabled = !ack1.checked; });
+ack2.addEventListener("change", () => { go2.disabled = !ack2.checked; });
+
+function buildWeb(){
+  const svg = document.createElementNS(SVGNS, "svg");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.setAttribute("class", "web");
+
+  const mainPts = SLOTS.map(s => {
+    const p = polarPoint(s.angle, R_POS);
+    return { x:p[0], y:p[1], key:s.key };
+  });
+  const mainMap = {};
+  mainPts.forEach(p => mainMap[p.key] = p);
+
+  const poly = document.createElementNS(SVGNS, "polygon");
+  poly.setAttribute("points", mainPts.map(p => p.x.toFixed(2)+","+p.y.toFixed(2)).join(" "));
+  poly.setAttribute("fill", "none");
+  poly.setAttribute("stroke", "rgba(232,192,125,.22)");
+  poly.setAttribute("stroke-width", "0.35");
+  svg.appendChild(poly);
+
+  mainPts.forEach(p => {
+    const line = document.createElementNS(SVGNS, "line");
+    line.setAttribute("x1", "50"); line.setAttribute("y1", "50");
+    line.setAttribute("x2", p.x.toFixed(2));
+    line.setAttribute("y2", p.y.toFixed(2));
+    line.setAttribute("stroke", "rgba(139,92,246,.25)");
+    line.setAttribute("stroke-width", "0.25");
+    svg.appendChild(line);
+  });
+
+  BRANCHES.forEach(b => {
+    const bp = polarPoint(b.angle, R_BRANCH);
+    b.parent.forEach(pk => {
+      const mp = mainMap[pk];
+      if (!mp) return;
+      const line = document.createElementNS(SVGNS, "line");
+      line.setAttribute("x1", mp.x.toFixed(2)); line.setAttribute("y1", mp.y.toFixed(2));
+      line.setAttribute("x2", bp[0].toFixed(2)); line.setAttribute("y2", bp[1].toFixed(2));
+      line.setAttribute("stroke", "rgba(232,192,125,.16)");
+      line.setAttribute("stroke-width", "0.22");
+      line.setAttribute("stroke-dasharray", "0.8 0.8");
+      svg.appendChild(line);
+    });
+  });
+
+  const ring = document.createElementNS(SVGNS, "circle");
+  ring.setAttribute("cx", "50");
+  ring.setAttribute("cy", "50");
+  ring.setAttribute("r", "17");
+  ring.setAttribute("fill", "none");
+  ring.setAttribute("stroke", "rgba(232,192,125,.18)");
+  ring.setAttribute("stroke-width", "0.3");
+  svg.appendChild(ring);
+
+  return svg;
+}
+
+function showDetail(btn, arc, slot, val){
+  if (activeNode) activeNode.classList.remove("active");
+  activeNode = btn;
+  btn.classList.add("active");
+
+  detail.innerHTML = `
+    <div class="detail-top">
+      <div class="detail-orb">${val}</div>
+      <div>
+        <div class="detail-slot">${slot.label}</div>
+        <div class="detail-name">${arc.emoji} ${arc.name}</div>
+      </div>
+    </div>
+    <p class="detail-roast">${arc.roast}</p>
+  `;
+}
+
+function render(day, month, year, rawName){
+  const name = (rawName || "").trim() || "Аноним";
+  const data = computeMatrix(day, month, year, name);
+  const values = data.main;
+  const branchValues = data.branches;
+  const centerVal = data.center;
+  const centerArc = arcAt(centerVal);
+
+  matrix.innerHTML = "";
+  activeNode = null;
+  matrix.appendChild(buildWeb());
+
+  const center = document.createElement("div");
+  center.className = "center";
+  center.innerHTML = `
+    <div class="c-rune">${centerArc.emoji}</div>
+    <div class="c-arc">${centerVal} · ${centerArc.name}</div>
+    <div class="c-name">${escapeHtml(name)}</div>
+    <div class="c-date">${String(day).padStart(2,"0")}.${String(month).padStart(2,"0")}.${year}</div>
+  `;
+  center.addEventListener("click", () => {
+    showDetail(center, centerArc, { label:"Аркан личности (центр)" }, centerVal);
+  });
+  matrix.appendChild(center);
+
+  let firstNode = null, firstArc = null, firstSlot = null, firstVal = null;
+
+  SLOTS.forEach((slot, i) => {
+    const [x, y] = polarPoint(slot.angle, R_POS);
+    const val = values[slot.key];
+    const arc = arcAt(val);
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "node";
+    btn.style.left = x + "%";
+    btn.style.top  = y + "%";
+    btn.style.animationDelay = (0.15 + i * 0.07) + "s";
+    btn.innerHTML = `
+      <span class="orb">${val}</span>
+      <span class="slot-label">${slot.label}</span>
+      <span class="arc-name">${arc.emoji} ${arc.name}</span>
+    `;
+    btn.addEventListener("click", () => showDetail(btn, arc, slot, val));
+    matrix.appendChild(btn);
+    if (i === 0) { firstNode = btn; firstArc = arc; firstSlot = slot; firstVal = val; }
+  });
+
+  BRANCHES.forEach((b, i) => {
+    const [x, y] = polarPoint(b.angle, R_BRANCH);
+    const val = branchValues[b.key];
+    const arc = arcAt(val);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "node branch";
+    btn.style.left = x + "%";
+    btn.style.top  = y + "%";
+    btn.style.animationDelay = (0.35 + i * 0.06) + "s";
+    btn.innerHTML = `
+      <span class="orb">${val}</span>
+      <span class="slot-label">${b.label}</span>
+      <span class="arc-name">${arc.emoji} ${arc.name}</span>
+    `;
+    btn.addEventListener("click", () => showDetail(btn, arc, { label:b.label + " (ответвление)" }, val));
+    matrix.appendChild(btn);
+  });
+
+  setTimeout(() => {
+    if (firstNode) showDetail(firstNode, firstArc, firstSlot, firstVal);
+  }, 700);
+
+  result.hidden = false;
+}
+
+function diffInfo(a, b){
+  const d = Math.abs(a - b);
+  if (d <= 2) return { cls:"hot",  text:"почти одинаково" };
+  if (d <= 6) return { cls:"warm", text:"рабочая разница" };
+  return { cls:"cold", text:"сильно по-разному" };
+}
+
+function compatRoast(val, arc){
+  const mid = Math.round(ARCANA_COUNT / 2);
+  const d = Math.abs(val - mid);
+  if (val === 1) return "Пара только начинает путь. Или просто оба не выспались. Скорее второе. Но начало — это всегда волнительно. 😴🌅";
+  if (val === ARCANA_COUNT) return "Максимальный аркан пары. Вы либо супергерои, либо уже срослись. В любом случае — поздравляем. И соболезнуем. 🦸‍♂️🦸‍♀️";
+  if (d <= 4) return `${arc.name} — это как два разных человека, которые случайно оказались в одной комнате. Им либо отлично, либо шумно. Третьего нет. 🚪🎭`;
+  if (d <= 10) return `${arc.name} в центре пары. Значит, вы оба стараетесь. И это уже больше, чем у большинства. Продолжайте. 💪✨`;
+  return `${arc.name} — редкий аркан для пары. Вам будет о чём поговорить. И о чём помолчать. И это уже искусство. 🎨🤫`;
+}
+
+function buildSummary(m1, m2, c, n1, n2){
+  const items = [];
+  let glue = 0, friction = 0;
+
+  SLOTS.forEach(s => {
+    const d = Math.abs(m1.main[s.key] - m2.main[s.key]);
+    if (d <= 2) glue++;
+    else if (d >= 8) friction++;
+  });
+
+  const glueBadge = glue >= 5 ? "good" : glue >= 3 ? "warm" : "neutral";
+  const frBadge = friction >= 4 ? "bad" : friction >= 2 ? "warm" : "neutral";
+
+  items.push(`<p><span class="badge ${glueBadge}">склейка</span> Совпадающих/близких секторов: <b>${glue}</b> из 8. ${glue >= 5 ? "Вы говорите на одном языке. Иногда одновременно. Это мило. И немного страшно. 👯‍♂️🗣️" : glue >= 3 ? "Есть общая база, но и различия найдутся. Это нормально. Скучно было бы одинаково. 🧩🔄" : "Вы очень разные. Возможно, в этом и кайф. Возможно, и нет. Матрица не осуждает. Почти. 🌈💥"}</p>`);
+
+  items.push(`<p><span class="badge ${frBadge}">трение</span> Секторов с сильной разницей: <b>${friction}</b> из 8. ${friction >= 4 ? "Будете спорить. Много. Громко. Но, возможно, продуктивно. Или просто громко. 🔥🗣️" : friction >= 2 ? "Есть точки, где вы не сойдётесь. Их стоит просто принять. Или игнорировать. Как удобнее. 🤷‍♂️🤷‍♀️" : "Почти нигде не конфликтуете. Либо вы очень похожи, либо очень вежливы. Или просто не говорите на сложные темы. 🕊️🤐"}</p>`);
+
+  const bottomDiff = Math.abs(m1.main.bottom - m2.main.bottom);
+  if (bottomDiff <= 3) items.push(`<p><span class="badge good">задача</span> Главная задача у вас похожа. Значит, и цели, и финал — примерно общие. Это сильно. И редко. И страшно. 🎯🤝</p>`);
+  else items.push(`<p><span class="badge bad">задача</span> Главные задачи различаются. Вам придётся договариваться, куда идти. Или идти параллельно. Или не идти. Вариантов много. 🛤️🚶</p>`);
+
+  const loveDiff = Math.abs(m1.main.bottomRight - m2.main.bottomRight);
+  if (loveDiff <= 3) items.push(`<p><span class="badge good">любовь</span> Сектор любви почти совпал. Вы хотите примерно одного. Это уже половина успеха. Вторая половина — не всё испортить. 💕😅</p>`);
+  else if (loveDiff >= 8) items.push(`<p><span class="badge bad">любовь</span> Сектор любви сильно разный. Один хочет одно, другой — другое. Главное — не молчать об этом. И не думать о бывшем in the big 2026. 🥀👻</p>`);
+
+  const centerArc = arcAt(c.center);
+  items.push(`<p><span class="badge neutral">центр</span> Аркан пары — <b>${c.center} · ${centerArc.emoji} ${centerArc.name}</b>. ${centerArc.roast}</p>`);
+
+  const budgetDiff = Math.abs(m1.main.right - m2.main.right);
+  if (budgetDiff <= 3) items.push(`<p><span class="badge good">финансы</span> Финансовые сектора близки. Вы либо оба транжирите, либо оба копите. Второе — лучше. Первое — веселее. 💸💰</p>`);
+  else items.push(`<p><span class="badge bad">финансы</span> Финансы у вас по-разному. Один копит, другой тратит. Это классика. Это конфликт. Это жизнь. 💳😤</p>`);
+
+  const talentDiff = Math.abs(m1.main.topLeft - m2.main.topLeft);
+  if (talentDiff <= 3) items.push(`<p><span class="badge good">таланты</span> Таланты похожи. Вы можете делать что-то вместе. Или соревноваться. Второе интереснее. 🏆🎭</p>`);
+  else items.push(`<p><span class="badge neutral">таланты</span> Таланты разные. Это не плохо. Это значит, что вы можете дополнять друг друга. Или просто не мешать. 🎨🔧</p>`);
+
+  items.push(`<p><span class="badge neutral">вердикт</span> ${glue >= 5 && friction <= 2 ? "У вас очень высокая совместимость. Поздравляем. Не испортите. 🎉💞" : friction >= 4 && glue <= 2 ? "У вас сложная совместимость. Это не приговор. Это вызов. Или квест. 🎮🔥" : "У вас средняя совместимость. Как у большинства. Это нормально. Работайте. Или не работайте. 🛠️🤷"}</p>`);
+
+  return items.join("");
+}
+
+function renderCompat(day1, month1, year1, name1, day2, month2, year2, name2){
+  const n1 = (name1 || "").trim() || "Аноним-1";
+  const n2 = (name2 || "").trim() || "Аноним-2";
+  const m1 = computeMatrix(day1, month1, year1, n1);
+  const m2 = computeMatrix(day2, month2, year2, n2);
+  const c  = compatMatrix(m1, m2);
+
+  const centerArc = arcAt(c.center);
+  const centerRoast = compatRoast(c.center, centerArc);
+
+  const cards = SLOTS.map(s => {
+    const val = c.main[s.key];
+    const arc = arcAt(val);
+    const d = diffInfo(m1.main[s.key], m2.main[s.key]);
+    return `
+      <div class="compat-card">
+        <div class="cc-slot">${s.label}</div>
+        <div class="cc-val">${val} · ${arc.emoji} ${arc.name}</div>
+        <div class="cc-diff ${d.cls}">${d.text}</div>
+      </div>
+    `;
+  }).join("");
+
+  const branchCards = BRANCHES.map(b => {
+    const val = c.branches[b.key];
+    const arc = arcAt(val);
+    const d = diffInfo(m1.branches[b.key], m2.branches[b.key]);
+    return `
+      <div class="compat-card">
+        <div class="cc-slot">${b.label} · ответвление</div>
+        <div class="cc-val">${val} · ${arc.emoji} ${arc.name}</div>
+        <div class="cc-diff ${d.cls}">${d.text}</div>
+      </div>
+    `;
+  }).join("");
+
+  const summary = buildSummary(m1, m2, c, n1, n2);
+
+  compatResult.innerHTML = `
+    <div class="compat-head">
+      <h2>💞 Совместимость</h2>
+      <p>${escapeHtml(n1)} + ${escapeHtml(n2)}</p>
+    </div>
+
+    <div class="compat-verdict">
+      <div class="cv-orb">${c.center}</div>
+      <div>
+        <div class="cv-slot">Аркан пары (центр)</div>
+        <div class="cv-name">${centerArc.emoji} ${centerArc.name}</div>
+        <p class="cv-roast">${centerRoast}</p>
+      </div>
+    </div>
+
+    <div class="compat-grid">
+      ${cards}
+    </div>
+
+    <div class="compat-summary">
+      <h3>Разбор совместимости</h3>
+      ${summary}
+    </div>
+
+    <div class="compat-summary">
+      <h3>Ответвления пары</h3>
+      <div class="compat-grid">${branchCards}</div>
+    </div>
+  `;
+
+  compatResult.hidden = false;
+  setTimeout(() => {
+    compatResult.scrollIntoView({ behavior:"smooth", block:"start" });
+  }, 120);
+}
+
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  if (!ack1.checked) return;
+
+  const name  = document.getElementById("name").value;
+  const day   = Number(document.getElementById("day").value);
+  const month = Number(document.getElementById("month").value);
+  const year  = Number(document.getElementById("year").value);
+
+  if (!day || !month || !year) return;
+
+  render(day, month, year, name);
+
+  setTimeout(() => {
+    result.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 120);
+});
+
+form2.addEventListener("submit", e => {
+  e.preventDefault();
+  if (!ack2.checked) return;
+
+  const name1  = document.getElementById("name").value;
+  const day1   = Number(document.getElementById("day").value);
+  const month1 = Number(document.getElementById("month").value);
+  const year1  = Number(document.getElementById("year").value);
+
+  const name2  = document.getElementById("name2").value;
+  const day2   = Number(document.getElementById("day2").value);
+  const month2 = Number(document.getElementById("month2").value);
+  const year2  = Number(document.getElementById("year2").value);
+
+  if (!day1 || !month1 || !year1 || !day2 || !month2 || !year2) return;
+
+  renderCompat(day1, month1, year1, name1, day2, month2, year2, name2);
+});
+</script>
+</body>
+</html>
